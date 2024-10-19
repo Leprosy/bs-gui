@@ -32,6 +32,7 @@
       object-fit: cover;
     }
 
+    #content.target,
     #content .block.target {
       border-color: #f00;
     }
@@ -64,7 +65,8 @@
 
       <div class="col-12 col-md-8">
         <h2>content</h2>
-        <div id="content" ondrop="dropHandler(event)" ondragover="dragoverHandler(event)"></div>
+        <div id="content" ondrop="dropHandler(event)" ondragover="dragoverHandler(event)"
+          ondragleave="dragleaveHandler(event)"></div>
       </div>
     </div>
   </div>
