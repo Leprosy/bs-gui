@@ -12,6 +12,7 @@
       --oaw-gap-1: 5px;
       --oaw-gap-2: calc(2 * var(--oaw-gap-1));
       --oaw-bradius: 4px;
+      --oaw-tool-space: 2px;
     }
 
     #content {
@@ -47,19 +48,21 @@
       font-weight: 600;
       cursor: pointer;
       user-select: none;
-      padding: 5px;
+      padding: var(--oaw-gap-1);
       width: fit-content;
-      border-radius: 5px;
+      border-radius: var(--oaw-bradius);
     }
 
     #content .block .tag {
-      top: 2px;
-      left: 2px;
+      top: var(--oaw-tool-space);
+      left: var(--oaw-tool-space);
     }
 
     #content .block .tools {
-      top: 2px;
-      right: 2px;
+      top: var(--oaw-tool-space);
+      right: var(--oaw-tool-space);
+      display: flex;
+      column-gap: var(--oaw-gap-2);
     }
   </style>
 </head>
