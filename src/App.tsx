@@ -1,23 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Search from "./components/Search";
+import getClasses from "./helpers/getClasses";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const classNames = getClasses();
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="row">
+        <div className="col-12 col-md-4">
+          <h2>tools</h2>
+          <div className="d-flex flex-column gap-2" id="tools"></div>
+          <Search label="Class" data={classNames} />
+        </div>
+
+        <div className="col-12 col-md-8">
+          <h2>content</h2>
+          <div id="content"></div>
+          {/*  onDrop="dropHandler(event)" ondragover="dragoverHandler(event)"
+          ondragleave="dragleaveHandler(event)"></div> --> */}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
+
+      <hr />
+
+      <div>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
@@ -29,7 +37,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
