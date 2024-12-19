@@ -1,6 +1,8 @@
 import { useState } from "react";
-import Search from "./components/Search";
+import SearchInput from "./components/SearchInput/SearchInput";
 import getClasses from "./helpers/getClasses";
+import Block from "./components/Block/Block";
+import HTMLContainer from "./components/HTMLContainer/HTMLContainer";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -12,12 +14,14 @@ function App() {
         <div className="col-12 col-md-4">
           <h2>tools</h2>
           <div className="d-flex flex-column gap-2" id="tools"></div>
-          <Search label="Class" data={classNames} />
+          <SearchInput label="Class" data={classNames} />
+          <hr />
+          <Block label="div" />
         </div>
 
         <div className="col-12 col-md-8">
           <h2>content</h2>
-          <div id="content"></div>
+          <HTMLContainer />
           {/*  onDrop="dropHandler(event)" ondragover="dragoverHandler(event)"
           ondragleave="dragleaveHandler(event)"></div> --> */}
         </div>
