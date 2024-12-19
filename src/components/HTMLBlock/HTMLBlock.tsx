@@ -1,7 +1,7 @@
 // import style from "./style.module.css";
 
 import { ReactElement, SyntheticEvent, useState } from "react";
-import { useDrop } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 import { dragTypes } from "../../constants/dragTypes";
 import getUID from "../../helpers/getUID";
 
@@ -12,6 +12,14 @@ interface HTMLBlockProps {
 
 const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
   const [blocks, setBlocks] = useState<ReactElement[]>([]);
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "none",
+    item: { id: "block" },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: dragTypes.Block,
@@ -41,13 +49,15 @@ const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
         console.log("block onclick", { label, blocks, ev });
         ev.stopPropagation();
       }}
-      ref={drop}
+      ref={(node) => drag(drop(node))}
       key={id}
       className={`bg-primary-subtle block border p-2 rounded ${
         isOver ? "border-danger" : "border-black "
       }`}
     >
-      <h5>*{label}*</h5>
+      <h5>
+        {label}/{id} - {isDragging.toString()}
+      </h5>
       {blocks}
     </div>
   );
