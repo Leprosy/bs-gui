@@ -13,7 +13,7 @@ interface HTMLBlockProps {
 const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
   const [blocks, setBlocks] = useState<ReactElement[]>([]);
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: "none",
+    type: dragTypes.HTMLBlock,
     item: { id: "block" },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
@@ -22,10 +22,14 @@ const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
 
   const [{ isOver }, drop] = useDrop(
     () => ({
-      accept: dragTypes.Block,
+      accept: [dragTypes.Block, dragTypes.HTMLBlock],
       drop: (item, monitor) => {
         if (monitor.isOver({ shallow: true })) {
-          console.log("drop on htmlblock", label, item);
+          console.log("drop on htmlblock", {
+            label,
+            item,
+            type: monitor.getItemType(),
+          });
           createHTMLBlock();
         } else {
           console.log("drop on htmlblock rejected", label, item);
