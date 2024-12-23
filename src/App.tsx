@@ -12,10 +12,11 @@ function App() {
           <h2>blocks</h2>
 
           <div className="d-flex flex-column gap-2" id="tools">
-            <HTMLBlock label="div" />
-            <HTMLBlock label="p" />
-            <HTMLBlock label="test" classes={["foo", "bar"]} />
-            <HTMLBlock label="too-much" classes={["foo", "bar", "oaw", "super", "taldo", "holy-crap"]} />
+            {/* TODO: get this from a JSON  */}
+            <HTMLBlock label="Basic div" tagName="div" />
+            <HTMLBlock label="Paragraph" tagName="p" />
+            <HTMLBlock label="test" tagName="div" classes={["foo", "bar"]} />
+            <HTMLBlock label="too-much" tagName="span" classes={["foo", "bar", "oaw", "super", "taldo", "holy-crap"]} />
           </div>
         </div>
 

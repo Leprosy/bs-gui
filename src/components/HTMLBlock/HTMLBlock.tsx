@@ -9,11 +9,16 @@ import { MainContext } from "../../context/Main";
 
 interface HTMLBlockProps {
   label: string;
+  tagName: string;
   classes?: string[];
   id?: string;
 }
 
-const HTMLBlock = ({ label, id, classes }: HTMLBlockProps) => {
+interface HTMLBlockType {
+  id: string;
+}
+
+const HTMLBlock = ({ label, id, tagName, classes }: HTMLBlockProps) => {
   const isMounted = id != undefined;
   const [blocks, setBlocks] = useState<ReactElement[]>([]);
   const [classList, setClassList] = useState<string[]>(classes || []);
@@ -30,7 +35,7 @@ const HTMLBlock = ({ label, id, classes }: HTMLBlockProps) => {
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: dragTypes.HTMLBlock,
-      drop: (item, monitor) => {
+      drop: (item: HTMLBlockType, monitor) => {
         if (monitor.isOver({ shallow: true }) && isMounted && item.id != id) {
           console.log("drop on htmlblock", {
             label,
@@ -81,8 +86,12 @@ const HTMLBlock = ({ label, id, classes }: HTMLBlockProps) => {
       }`}
     >
       <div>
-        <p className="fw-bold">
-          {label} - mnt:{isMounted.toString()} - id:{id}
+        <p>
+          <strong>
+            {label} - mnt:{isMounted.toString()} - id:{id}
+          </strong>
+          <br />
+          <small>{tagName}</small>
         </p>
       </div>
 
