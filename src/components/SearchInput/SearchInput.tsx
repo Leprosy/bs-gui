@@ -4,26 +4,27 @@ import style from "./style.module.css";
 interface SearchProps {
   label: string;
   data: string[];
+  onSelect: (value: string) => void;
 }
 
-const SearchInput = ({ label, data }: SearchProps) => {
+const SearchInput = ({ label, data, onSelect }: SearchProps) => {
   const [classList, setClassList] = useState<string[]>([]);
   const [value, setValue] = useState("");
 
   // Listeners
-  const onFocus = (ev: React.FocusEvent<HTMLInputElement>) => {
+  const onFocusHandler = (ev: React.FocusEvent<HTMLInputElement>) => {
     const parent = ev.currentTarget.parentElement;
     parent?.querySelector(".dropdown-menu")?.classList.add("d-block");
   };
 
-  const onBlur = (ev: React.FocusEvent<HTMLInputElement>) => {
+  const onBlurHandler = (ev: React.FocusEvent<HTMLInputElement>) => {
     setTimeout(() => {
       const parent = ev.target.parentElement;
       parent?.querySelector(".dropdown-menu")?.classList.remove("d-block");
     }, 150); // TODO: fix this fucking hack
   };
 
-  const onChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeHandler = (ev: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = ev.currentTarget.value;
     setValue(newValue);
 
@@ -44,9 +45,9 @@ const SearchInput = ({ label, data }: SearchProps) => {
       <input
         placeholder="Search..."
         value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        onFocus={onFocus}
+        onChange={onChangeHandler}
+        onBlur={onBlurHandler}
+        onFocus={onFocusHandler}
       />
 
       {classList.length > 0 ? (
@@ -56,7 +57,9 @@ const SearchInput = ({ label, data }: SearchProps) => {
               <a
                 className="dropdown-item"
                 onClick={(ev) => {
-                  setValue(ev.currentTarget.innerText);
+                  const newValue = ev.currentTarget.innerText;
+                  setValue(newValue);
+                  onSelect(newValue);
                 }}
                 key={i}
               >

@@ -10,7 +10,7 @@ const HTMLContainer = () => {
   const [blocks, setBlocks] = useState<ReactElement[]>([]);
   const [{ isOver }, drop] = useDrop(
     () => ({
-      accept: dragTypes.Block,
+      accept: dragTypes.HTMLBlock,
       drop: (item, monitor) => {
         if (monitor.isOver({ shallow: true })) {
           console.log("drop on htmlcontainer", item);
@@ -31,13 +31,10 @@ const HTMLContainer = () => {
 
   return (
     <div>
-      <p onClick={() => createHTMLBlock()}>Create block</p>
       <div
         ref={drop}
         id="content"
-        className={`bg-success-subtle block border p-2 rounded ${
-          isOver ? "border-danger" : "border-black "
-        }`}
+        className={`bg-success-subtle border p-2 rounded ${isOver ? "border-danger" : "border-black "}`}
         style={{ minHeight: 200 }}
       >
         {blocks}

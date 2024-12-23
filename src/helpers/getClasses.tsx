@@ -10,10 +10,7 @@ const getClasses = (): string[] => {
       rules.forEach((rule: CSSRule) => {
         if (rule instanceof CSSStyleRule) {
           if (rule.selectorText) {
-            const matches = rule.selectorText.matchAll(
-              /[a-z_\-0-9]*\.([a-z_\-0-9]+)/gi
-            );
-
+            const matches = rule.selectorText.matchAll(/[a-z_\-0-9]*\.([a-z_\-0-9]+)/gi);
             let data = matches.next();
 
             while (!data.done) {

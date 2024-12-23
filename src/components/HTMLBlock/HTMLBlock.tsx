@@ -1,20 +1,27 @@
 // import style from "./style.module.css";
 
-import { ReactElement, SyntheticEvent, useState } from "react";
+import { ReactElement, SyntheticEvent, useContext, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { dragTypes } from "../../constants/dragTypes";
 import getUID from "../../helpers/getUID";
+import SearchInput from "../SearchInput/SearchInput";
+import { MainContext } from "../../context/Main";
 
 interface HTMLBlockProps {
   label: string;
-  id: string;
+  classes?: string[];
+  id?: string;
 }
 
-const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
+const HTMLBlock = ({ label, id, classes }: HTMLBlockProps) => {
+  const isMounted = id != undefined;
   const [blocks, setBlocks] = useState<ReactElement[]>([]);
+  const [classList, setClassList] = useState<string[]>(classes || []);
+  const { classNames } = useContext(MainContext);
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: dragTypes.HTMLBlock,
-    item: { id: "block" },
+    item: { id },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -22,9 +29,9 @@ const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
 
   const [{ isOver }, drop] = useDrop(
     () => ({
-      accept: [dragTypes.Block, dragTypes.HTMLBlock],
+      accept: dragTypes.HTMLBlock,
       drop: (item, monitor) => {
-        if (monitor.isOver({ shallow: true })) {
+        if (monitor.isOver({ shallow: true }) && isMounted && item.id != id) {
           console.log("drop on htmlblock", {
             label,
             item,
@@ -42,27 +49,72 @@ const HTMLBlock = ({ label, id }: HTMLBlockProps) => {
     [blocks]
   );
 
+  const onClickHandler = (ev: SyntheticEvent) => {
+    console.log("block onclick", { label, id, blocks, ev });
+    ev.stopPropagation();
+  };
+
   const createHTMLBlock = () => {
     console.log("block was", blocks);
-    setBlocks([...blocks, <HTMLBlock label="SubBlock" id={getUID()} />]);
+    setBlocks([...blocks, <HTMLBlock label="SubBlock" id={getUID()} classes={[]} />]);
+  };
+
+  const addClass = (className: string) => {
+    console.log("adding", className);
+    const newList = new Set(classList);
+    newList.add(className);
+    setClassList([...newList]);
+  };
+
+  const removeClass = (className: string) => {
+    console.log("removing", className);
+    setClassList(classList.filter((cls: string) => cls != className));
   };
 
   return (
     <div
-      onClick={(ev: SyntheticEvent) => {
-        console.log("block onclick", { label, blocks, ev });
-        ev.stopPropagation();
-      }}
+      onClick={onClickHandler}
       ref={(node) => drag(drop(node))}
       key={id}
-      className={`bg-primary-subtle block border p-2 rounded ${
+      className={`bg-primary-subtle block border p-2 d-flex flex-column rounded ${
         isOver ? "border-danger" : "border-black "
       }`}
     >
-      <h5>
-        {label}/{id} - {isDragging.toString()}
-      </h5>
-      {blocks}
+      <div>
+        <p className="fw-bold">
+          {label} - mnt:{isMounted.toString()} - id:{id}
+        </p>
+      </div>
+
+      <div>
+        <p>ClassList</p>
+        <div>
+          {classList.length > 0 ? (
+            <div className="d-flex flex-wrap gap-2 mb-3">
+              {classList.map((el: string) => (
+                <span className="d-flex gap-1 badge text-bg-primary">
+                  {el}{" "}
+                  <span role="button" onClick={() => removeClass(el)}>
+                    x
+                  </span>
+                </span>
+              ))}
+            </div>
+          ) : (
+            ""
+          )}
+          <SearchInput label="Add class" data={classNames} onSelect={(value: string) => addClass(value)} />
+        </div>
+      </div>
+
+      {isMounted ? (
+        <div>
+          <hr />
+          {blocks}
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
