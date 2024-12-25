@@ -1,11 +1,12 @@
 // import style from "./style.module.css";
 
-import { ReactElement, SyntheticEvent, useContext, useState } from "react";
+import { PropsWithChildren, SyntheticEvent, useContext, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { dragTypes } from "../../constants/dragTypes";
 import getUID from "../../helpers/getUID";
 import SearchInput from "../SearchInput/SearchInput";
 import { MainContext } from "../../context/Main";
+import { HTMLBlockStructure } from "../../types";
 
 interface HTMLBlockProps {
   label: string;
@@ -14,19 +15,14 @@ interface HTMLBlockProps {
   id?: string;
 }
 
-interface HTMLBlockType {
-  id: string;
-}
-
-const HTMLBlock = ({ label, id, tagName, classes }: HTMLBlockProps) => {
+const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<HTMLBlockProps>) => {
   const isMounted = id != undefined;
-  const [blocks, setBlocks] = useState<ReactElement[]>([]);
   const [classList, setClassList] = useState<string[]>(classes || []);
-  const { classNames } = useContext(MainContext);
+  const mainData = useContext(MainContext);
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: dragTypes.HTMLBlock,
-    item: { id },
+    item: { id, label, tagName },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -35,14 +31,11 @@ const HTMLBlock = ({ label, id, tagName, classes }: HTMLBlockProps) => {
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: dragTypes.HTMLBlock,
-      drop: (item: HTMLBlockType, monitor) => {
+      drop: (item: HTMLBlockStructure, monitor) => {
         if (monitor.isOver({ shallow: true }) && isMounted && item.id != id) {
-          console.log("drop on htmlblock", {
-            label,
-            item,
-            type: monitor.getItemType(),
-          });
-          createHTMLBlock();
+          console.log("drop on htmlblock", item);
+          const newId = getUID();
+          mainData.push({ id: newId, label: item.label, tagName: item.tagName, children: [] }, id);
         } else {
           console.log("drop on htmlblock rejected", label, item);
         }
@@ -51,17 +44,12 @@ const HTMLBlock = ({ label, id, tagName, classes }: HTMLBlockProps) => {
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [blocks]
+    [mainData]
   );
 
   const onClickHandler = (ev: SyntheticEvent) => {
-    console.log("block onclick", { label, id, blocks, ev });
+    console.log("block onclick", { label, id, ev });
     ev.stopPropagation();
-  };
-
-  const createHTMLBlock = () => {
-    console.log("block was", blocks);
-    setBlocks([...blocks, <HTMLBlock label="SubBlock" id={getUID()} classes={[]} />]);
   };
 
   const addClass = (className: string) => {
@@ -88,7 +76,7 @@ const HTMLBlock = ({ label, id, tagName, classes }: HTMLBlockProps) => {
       <div>
         <p>
           <strong>
-            {label} - mnt:{isMounted.toString()} - id:{id}
+            {label} - mnt:{isMounted.toString()} - id:{id} - isDrag:{isDragging.toString()}
           </strong>
           <br />
           <small>{tagName}</small>
@@ -112,14 +100,14 @@ const HTMLBlock = ({ label, id, tagName, classes }: HTMLBlockProps) => {
           ) : (
             ""
           )}
-          <SearchInput label="Add class" data={classNames} onSelect={(value: string) => addClass(value)} />
+          <SearchInput label="Add class" data={mainData.classNames} onSelect={(value: string) => addClass(value)} />
         </div>
       </div>
 
       {isMounted ? (
         <div>
           <hr />
-          {blocks}
+          {children}
         </div>
       ) : (
         ""

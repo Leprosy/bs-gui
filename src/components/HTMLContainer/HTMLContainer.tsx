@@ -1,33 +1,32 @@
 // import style from "./style.module.css";
 
-import { ReactElement, useState } from "react";
+import { useContext } from "react";
 import { useDrop } from "react-dnd";
-import HTMLBlock from "../HTMLBlock/HTMLBlock";
 import { dragTypes } from "../../constants/dragTypes";
 import getUID from "../../helpers/getUID";
+import { MainContext } from "../../context/Main";
+import { HTMLBlockStructure } from "../../types";
+import getTree from "../../helpers/getTree";
 
 const HTMLContainer = () => {
-  const [blocks, setBlocks] = useState<ReactElement[]>([]);
+  const mainData = useContext(MainContext);
+
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: dragTypes.HTMLBlock,
-      drop: (item, monitor) => {
+      drop: (item: HTMLBlockStructure, monitor) => {
         if (monitor.isOver({ shallow: true })) {
           console.log("drop on htmlcontainer", item);
-          createHTMLBlock();
+          const id = item.id || getUID();
+          mainData.push({ id, label: item.label, tagName: item.tagName, children: [] });
         }
       },
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [blocks]
+    [mainData]
   );
-
-  const createHTMLBlock = () => {
-    console.log("block was", blocks);
-    setBlocks([...blocks, <HTMLBlock label={"Block"} id={getUID()} />]);
-  };
 
   return (
     <div>
@@ -37,7 +36,7 @@ const HTMLContainer = () => {
         className={`bg-success-subtle border p-2 rounded ${isOver ? "border-danger" : "border-black "}`}
         style={{ minHeight: 200 }}
       >
-        {blocks}
+        {getTree(mainData.HTMLBlockTree)}
       </div>
     </div>
   );
