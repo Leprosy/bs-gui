@@ -1,9 +1,11 @@
-import { useState } from "react";
-import HTMLContainer from "./components/HTMLContainer/HTMLContainer";
+import { useContext, useState } from "react";
 import HTMLBlock from "./components/HTMLBlock/HTMLBlock";
+import { MainContext } from "./context/Main";
+import getTree from "./helpers/getTree";
 
 function App() {
   const [count, setCount] = useState(0);
+  const mainData = useContext(MainContext);
 
   return (
     <div className="container">
@@ -23,7 +25,7 @@ function App() {
         <div className="col-12 col-md-8">
           <h2>layout</h2>
 
-          <HTMLContainer />
+          {getTree(mainData.HTMLBlockTree)}
         </div>
       </div>
 

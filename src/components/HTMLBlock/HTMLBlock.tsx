@@ -106,6 +106,9 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
 
       {isMounted ? (
         <div>
+          <div>
+            <button onClick={() => mainData.remove(id)}>Remove</button>
+          </div>
           <hr />
           {children}
         </div>
