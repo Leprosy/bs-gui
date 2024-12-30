@@ -17,27 +17,34 @@ interface HTMLBlockProps {
 
 const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<HTMLBlockProps>) => {
   const isMounted = id != undefined;
+  const isRoot = id == "#root";
   const [classList, setClassList] = useState<string[]>(classes || []);
   const mainData = useContext(MainContext);
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: dragTypes.HTMLBlock,
-    item: { id, label, tagName },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: dragTypes.HTMLBlock,
+      item: { id, label, tagName },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
     }),
-  }));
+    [mainData]
+  );
 
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: dragTypes.HTMLBlock,
       drop: (item: HTMLBlockStructure, monitor) => {
         if (monitor.isOver({ shallow: true }) && isMounted && item.id != id) {
-          console.log("drop on htmlblock", item);
-          const newId = getUID();
-          mainData.push({ id: newId, label: item.label, tagName: item.tagName, children: [] }, id);
-        } else {
-          console.log("drop on htmlblock rejected", label, item);
+          if (item.id) {
+            console.log("Dropping existing htmlblock", item);
+            mainData.drag(item.id, id);
+          } else {
+            console.log("Dropping new htmlblock", item);
+            const newId = getUID();
+            mainData.push({ id: newId, label: item.label, tagName: item.tagName, children: [] }, id);
+          }
         }
       },
       collect: (monitor) => ({
@@ -106,9 +113,13 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
 
       {isMounted ? (
         <div>
-          <div>
-            <button onClick={() => mainData.remove(id)}>Remove</button>
-          </div>
+          {!isRoot ? (
+            <div>
+              <button onClick={() => mainData.remove(id)}>Remove</button>
+            </div>
+          ) : (
+            ""
+          )}
           <hr />
           {children}
         </div>
