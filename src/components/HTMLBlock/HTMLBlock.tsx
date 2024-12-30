@@ -71,27 +71,33 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
     setClassList(classList.filter((cls: string) => cls != className));
   };
 
+  const getClass = () => {
+    const baseClass = "block border p-2 d-flex flex-column rounded";
+    return isMounted
+      ? `${baseClass} bg-secondary-subtle  ${isOver ? "border-danger" : "border-black "}`
+      : `${baseClass} bg-primary-subtle border-black`;
+  };
+
   return (
-    <div
-      onClick={onClickHandler}
-      ref={(node) => drag(drop(node))}
-      key={id}
-      className={`bg-primary-subtle block border p-2 d-flex flex-column rounded ${
-        isOver ? "border-danger" : "border-black "
-      }`}
-    >
-      <div>
-        <p>
-          <strong>
-            {label} - mnt:{isMounted.toString()} - id:{id} - isDrag:{isDragging.toString()}
-          </strong>
-          <br />
-          <small>{tagName}</small>
+    <div onClick={onClickHandler} ref={(node) => drag(drop(node))} key={id} className={getClass()}>
+      <div className="d-flex flex-row justify-content-between">
+        <p className="d-flex flex-column">
+          {!isMounted ? <strong className="mb-0">{label}</strong> : ""}
+          <small>
+            {tagName}
+            {classList.map((item: string) => `.${item}`)}
+          </small>
         </p>
+        {!isRoot && isMounted ? (
+          <span>
+            <button onClick={() => mainData.remove(id)}>x</button>
+          </span>
+        ) : (
+          ""
+        )}
       </div>
 
-      <div>
-        <p>ClassList</p>
+      {!isMounted ? (
         <div>
           {classList.length > 0 ? (
             <div className="d-flex flex-wrap gap-2 mb-3">
@@ -107,25 +113,13 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
           ) : (
             ""
           )}
-          <SearchInput label="Add class" data={mainData.classNames} onSelect={(value: string) => addClass(value)} />
-        </div>
-      </div>
-
-      {isMounted ? (
-        <div>
-          {!isRoot ? (
-            <div>
-              <button onClick={() => mainData.remove(id)}>Remove</button>
-            </div>
-          ) : (
-            ""
-          )}
-          <hr />
-          {children}
+          <SearchInput label="Add classes" data={mainData.classNames} onSelect={(value: string) => addClass(value)} />
         </div>
       ) : (
         ""
       )}
+
+      {isMounted ? <div>{children}</div> : ""}
     </div>
   );
 };
