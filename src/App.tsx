@@ -16,8 +16,12 @@ function App() {
             {/* TODO: get this from a JSON  */}
             <HTMLBlock label="Basic div" tagName="div" />
             <HTMLBlock label="Paragraph" tagName="p" />
-            <HTMLBlock label="test" tagName="div" classes={["foo", "bar"]} />
-            <HTMLBlock label="too-much" tagName="span" classes={["foo", "bar", "oaw", "super", "taldo", "holy-crap"]} />
+            <HTMLBlock label="test" tagName="div" classList={["foo", "bar"]} />
+            <HTMLBlock
+              label="too-much"
+              tagName="span"
+              classList={["foo", "bar", "oaw", "super", "taldo", "holy-crap"]}
+            />
           </div>
         </div>
 

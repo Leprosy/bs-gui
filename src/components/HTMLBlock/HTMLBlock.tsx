@@ -11,25 +11,26 @@ import { HTMLBlockStructure } from "../../types";
 interface HTMLBlockProps {
   label: string;
   tagName: string;
-  classes?: string[];
+  classList?: string[];
   id?: string;
 }
 
-const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<HTMLBlockProps>) => {
+const HTMLBlock = ({ label, id, tagName, classList, children }: PropsWithChildren<HTMLBlockProps>) => {
+  console.log(classList);
   const isMounted = id != undefined;
   const isRoot = id == "#root";
-  const [classList, setClassList] = useState<string[]>(classes || []);
+  const [newClassList, setNewClassList] = useState<string[]>(classList || []);
   const mainData = useContext(MainContext);
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: dragTypes.HTMLBlock,
-      item: { id, label, tagName },
+      item: { id, label, tagName, classList: newClassList },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [mainData]
+    [mainData, newClassList]
   );
 
   const [{ isOver }, drop] = useDrop(
@@ -43,7 +44,10 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
           } else {
             console.log("Dropping new htmlblock", item);
             const newId = getUID();
-            mainData.push({ id: newId, label: item.label, tagName: item.tagName, children: [] }, id);
+            mainData.push(
+              { id: newId, label: item.label, tagName: item.tagName, classList: item.classList, children: [] },
+              id
+            );
           }
         }
       },
@@ -61,14 +65,14 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
 
   const addClass = (className: string) => {
     console.log("adding", className);
-    const newList = new Set(classList);
+    const newList = new Set(newClassList);
     newList.add(className);
-    setClassList([...newList]);
+    setNewClassList([...newList]);
   };
 
   const removeClass = (className: string) => {
     console.log("removing", className);
-    setClassList(classList.filter((cls: string) => cls != className));
+    setNewClassList(newClassList.filter((cls: string) => cls != className));
   };
 
   const getClass = () => {
@@ -81,17 +85,21 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
   return (
     <div onClick={onClickHandler} ref={(node) => drag(drop(node))} key={id} className={getClass()}>
       <div className="d-flex flex-row justify-content-between">
-        <p className="d-flex flex-column">
-          {!isMounted ? <strong className="mb-0">{label}</strong> : ""}
-          <small>
-            {tagName}
-            {classList.map((item: string) => `.${item}`)}
-          </small>
-        </p>
+        <div className="d-flex flex-column mb-2">
+          {!isMounted ? <strong>{label}</strong> : ""}
+          <p>
+            <small className="badge text-bg-dark">
+              {tagName}
+              {newClassList.map((item: string) => `.${item}`)}
+            </small>
+          </p>
+        </div>
         {!isRoot && isMounted ? (
-          <span>
-            <button onClick={() => mainData.remove(id)}>x</button>
-          </span>
+          <p>
+            <span className="badge text-bg-dark" role="button" onClick={() => mainData.remove(id)}>
+              x
+            </span>
+          </p>
         ) : (
           ""
         )}
@@ -99,9 +107,9 @@ const HTMLBlock = ({ label, id, tagName, classes, children }: PropsWithChildren<
 
       {!isMounted ? (
         <div>
-          {classList.length > 0 ? (
+          {newClassList.length > 0 ? (
             <div className="d-flex flex-wrap gap-2 mb-3">
-              {classList.map((el: string) => (
+              {newClassList.map((el: string) => (
                 <span className="d-flex gap-1 badge text-bg-primary">
                   {el}{" "}
                   <span role="button" onClick={() => removeClass(el)}>
