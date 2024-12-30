@@ -30,10 +30,9 @@ export function MainProvider({ children }: PropsWithChildren) {
 
     if (dragged) {
       dragged.id = getUID();
+      dragged.children.forEach((child: HTMLBlockStructure) => (child.parentId = dragged.id));
       const pushedTree = push(dragged, into, tree);
-      // console.log("MainContext.drag: new tree after push", pushedTree);
       const removedTree = remove(id, pushedTree);
-      // console.log("MainContext.drag: new tree after remove", removedTree);
       return removedTree;
     }
 
