@@ -7,6 +7,7 @@ import getUID from "../../helpers/getUID";
 import SearchInput from "../SearchInput/SearchInput";
 import { MainContext } from "../../context/Main";
 import { HTMLBlockStructure } from "../../types";
+import ToggleContainer from "../ToggleContainer/ToggleContainer";
 
 interface HTMLBlockProps {
   label: string;
@@ -76,9 +77,10 @@ const HTMLBlock = ({ label, id, tagName, classList, children }: PropsWithChildre
   };
 
   const getClass = () => {
-    const baseClass = "block border p-2 d-flex flex-column rounded";
+    const nodeClass = newClassList.map((cls: string) => cls);
+    const baseClass = "block border p-2 rounded";
     return isMounted
-      ? `${baseClass} bg-secondary-subtle  ${isOver ? "border-danger" : "border-black "}`
+      ? `${nodeClass} ${baseClass} bg-secondary-subtle ${isOver ? "border-danger" : "border-black "}`
       : `${baseClass} bg-primary-subtle border-black`;
   };
 
@@ -94,6 +96,7 @@ const HTMLBlock = ({ label, id, tagName, classList, children }: PropsWithChildre
             </small>
           </p>
         </div>
+
         {!isRoot && isMounted ? (
           <p>
             <span className="badge text-bg-dark" role="button" onClick={() => mainData.remove(id)}>
@@ -105,8 +108,8 @@ const HTMLBlock = ({ label, id, tagName, classList, children }: PropsWithChildre
         )}
       </div>
 
-      {!isMounted ? (
-        <div>
+      <div>
+        <ToggleContainer label="Classes" startVisible={!isMounted}>
           {newClassList.length > 0 ? (
             <div className="d-flex flex-wrap gap-2 mb-3">
               {newClassList.map((el: string) => (
@@ -122,12 +125,10 @@ const HTMLBlock = ({ label, id, tagName, classList, children }: PropsWithChildre
             ""
           )}
           <SearchInput label="Add classes" data={mainData.classNames} onSelect={(value: string) => addClass(value)} />
-        </div>
-      ) : (
-        ""
-      )}
+        </ToggleContainer>
+      </div>
 
-      {isMounted ? <div>{children}</div> : ""}
+      {isMounted ? children : ""}
     </div>
   );
 };
